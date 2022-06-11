@@ -4,15 +4,17 @@
   <meta charset="utf-8">
   
   
-  <title>hellow | Hexo</title>
+  <title>deploy_hexo | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="article">
-<meta property="og:title" content="hellow">
-<meta property="og:url" content="http://example.com/2022/06/11/hellow/index.html">
+  <meta name="description" content="部署Hexo显示Permission Denied的解决方法第一步查看_config.yml 中git的配置,和GitHub的ssh配置 _config.yml 中git的配置如下:1234deploy:  type: git  repo: git@github.com:start-spt&#x2F;start-spt.github.io.git  branch: master  第二步第一步检查无误后,仍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="deploy_hexo">
+<meta property="og:url" content="http://example.com/2022/06/11/deploy-hexo/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="部署Hexo显示Permission Denied的解决方法第一步查看_config.yml 中git的配置,和GitHub的ssh配置 _config.yml 中git的配置如下:1234deploy:  type: git  repo: git@github.com:start-spt&#x2F;start-spt.github.io.git  branch: master  第二步第一步检查无误后,仍">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-11T14:20:41.000Z">
-<meta property="article:modified_time" content="2022-06-11T14:20:41.430Z">
+<meta property="article:published_time" content="2022-06-11T14:41:27.000Z">
+<meta property="article:modified_time" content="2022-06-11T14:54:26.288Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -71,10 +73,10 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-hellow" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-deploy-hexo" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2022/06/11/hellow/" class="article-date">
-  <time class="dt-published" datetime="2022-06-11T14:20:41.000Z" itemprop="datePublished">2022-06-11</time>
+    <a href="/2022/06/11/deploy-hexo/" class="article-date">
+  <time class="dt-published" datetime="2022-06-11T14:41:27.000Z" itemprop="datePublished">2022-06-11</time>
 </a>
     
   </div>
@@ -85,7 +87,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      hellow
+      deploy_hexo
     </h1>
   
 
@@ -93,11 +95,18 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <h2 id="部署Hexo显示Permission-Denied的解决方法"><a href="#部署Hexo显示Permission-Denied的解决方法" class="headerlink" title="部署Hexo显示Permission Denied的解决方法"></a>部署Hexo显示Permission Denied的解决方法</h2><h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p>查看_config.yml 中git的配置,和GitHub的ssh配置</p>
+<h4 id="config-yml-中git的配置如下"><a href="#config-yml-中git的配置如下" class="headerlink" title="_config.yml 中git的配置如下:"></a>_config.yml 中git的配置如下:</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repo: git@github.com:start-spt/start-spt.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>第一步检查无误后,仍然存在问题,删除deploy_git,重新以下,操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br><span class="line">$ hexo generate</span><br><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/06/11/hellow/" data-id="cl49z81yp0001axmx8bc57dez" data-title="hellow" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/06/11/deploy-hexo/" data-id="cl4a032j80000anmxay4tfqqa" data-title="deploy_hexo" class="article-share-link">Share</a>
       
       
       
@@ -148,7 +157,7 @@
       <ul>
         
           <li>
-            <a href="/2022/06/11/hellow/">hellow</a>
+            <a href="/2022/06/11/deploy-hexo/">deploy_hexo</a>
           </li>
         
           <li>

@@ -71,10 +71,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-hellow" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-deploy-hexo" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2022/06/11/hellow/" class="article-date">
-  <time class="dt-published" datetime="2022-06-11T14:20:41.000Z" itemprop="datePublished">2022-06-11</time>
+    <a href="/2022/06/11/deploy-hexo/" class="article-date">
+  <time class="dt-published" datetime="2022-06-11T14:41:27.000Z" itemprop="datePublished">2022-06-11</time>
 </a>
     
   </div>
@@ -85,7 +85,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/06/11/hellow/">hellow</a>
+      <a class="p-name article-title" href="/2022/06/11/deploy-hexo/">deploy_hexo</a>
     </h1>
   
 
@@ -93,11 +93,18 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <h2 id="部署Hexo显示Permission-Denied的解决方法"><a href="#部署Hexo显示Permission-Denied的解决方法" class="headerlink" title="部署Hexo显示Permission Denied的解决方法"></a>部署Hexo显示Permission Denied的解决方法</h2><h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p>查看_config.yml 中git的配置,和GitHub的ssh配置</p>
+<h4 id="config-yml-中git的配置如下"><a href="#config-yml-中git的配置如下" class="headerlink" title="_config.yml 中git的配置如下:"></a>_config.yml 中git的配置如下:</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repo: git@github.com:start-spt/start-spt.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>第一步检查无误后,仍然存在问题,删除deploy_git,重新以下,操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br><span class="line">$ hexo generate</span><br><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/06/11/hellow/" data-id="cl49z81yp0001axmx8bc57dez" data-title="hellow" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/06/11/deploy-hexo/" data-id="cl4a032j80000anmxay4tfqqa" data-title="deploy_hexo" class="article-share-link">Share</a>
       
       
       
@@ -148,7 +155,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/06/11/hello-world/" data-id="cl49z81yk0000axmxgmf5d9pj" data-title="Hello World" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/06/11/hello-world/" data-id="cl4a032jd0001anmxgryhgi7s" data-title="Hello World" class="article-share-link">Share</a>
       
       
       
@@ -191,7 +198,7 @@
       <ul>
         
           <li>
-            <a href="/2022/06/11/hellow/">hellow</a>
+            <a href="/2022/06/11/deploy-hexo/">deploy_hexo</a>
           </li>
         
           <li>
