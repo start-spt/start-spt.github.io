@@ -17,4 +17,8 @@
 
  首页打字效果:https://cofbro.github.io/2022/05/27/ChengeToButterfly/#2-config-butterfly-yml-%E4%B8%AD%E7%9A%84%E9%85%8D%E7%BD%AE
 
+ valine:https://blog.csdn.net/wugenqiang/article/details/105744843
+
+ 同类博客参考:https://tzy1997.com/articles/hexo541u/#post-comment
+
 
