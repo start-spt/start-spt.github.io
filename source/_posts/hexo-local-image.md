@@ -25,7 +25,7 @@ post_asset_folder: true
 ├──test.png
 └─article.md
 ```
-④ 写法：在文章里即可使用![](./article/test.png)在本地显示图片test.png，同时在静态网页中也可以正常显示。
+④ 写法：在文章里即可使用`![](./article/test.png)`在本地显示图片test.png，同时在静态网页中也可以正常显示。
 
 >注意事项：
 - 1、创建文件夹名称要和md文件名称保持一致；
