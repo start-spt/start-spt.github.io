@@ -614,11 +614,11 @@ subtitle:
   # source: 2  調用一句網（簡體） http://yijuzhan.com/
   # source: 3  調用今日詩詞（簡體） https://www.jinrishici.com/
   # subtitle 會先顯示 source , 再顯示 sub 的內容
-  source: 1
+  source: 3
   # 如果關閉打字效果，subtitle 只會顯示 sub 的第一行文字
   sub:
-    - 梦想这东西和经典一样 永远不会因为时间而褪色
-    - 何其荣幸 何德何能 #注意这里的格式   空格和 '-'
+    - 时间不是流逝的，流逝的是我们
+    - 永远相信，美好的事情即将发生 #注意这里的格式   空格和 '-'
 
 # Loading Animation (加載動畫)
 preloader: false
