@@ -5,6 +5,7 @@ categories:
 - 构建
 tags:
 - hexo
+cover: https://fastly.jsdelivr.net/gh/jerryc127/CDN@latest/cover/default_bg.png
 ---
 
 ## 第一步
