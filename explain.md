@@ -13,4 +13,8 @@
 
  参考: https://butterfly.js.org/
 
+ 在线聊天:https://blog.csdn.net/YR_112233/article/details/122797554
+
+ 首页打字效果:https://cofbro.github.io/2022/05/27/ChengeToButterfly/#2-config-butterfly-yml-%E4%B8%AD%E7%9A%84%E9%85%8D%E7%BD%AE
+
 
