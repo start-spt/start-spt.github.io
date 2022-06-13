@@ -3,6 +3,7 @@ title: 在Hexo中使用本地图片
 date: 2022-06-13 13:15:19
 tags:
 - hexo
+cover: https://tpc.googlesyndication.com/simgad/15957471259188909759/downsize_200k_v1?w=600&h=314
 ---
 
 ## 问题描述

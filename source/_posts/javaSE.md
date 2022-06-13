@@ -5,6 +5,7 @@ tags:
 - java
 categories:
 - java基础
+cover: https://s2.loli.net/2022/06/12/iNnLWHqxXy9ZBJu.png
 ---
 
 # 一、java基础
