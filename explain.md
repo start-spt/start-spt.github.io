@@ -19,6 +19,10 @@
 
  valine:https://blog.csdn.net/wugenqiang/article/details/105744843
 
- 同类博客参考:https://tzy1997.com/articles/hexo541u/#post-comment
+ 同类博客参考:
+ 1. https://tzy1997.com/articles/hexo541u/#post-comment
+ 2. https://guole.fun/archives/
 
+
+文章内容美化: https://guole.fun/posts/butterfly-custom/#%E6%96%87%E7%AB%A0%E7%B4%A0%E6%9D%90
 

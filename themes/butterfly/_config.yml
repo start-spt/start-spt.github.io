@@ -4,7 +4,7 @@
 
 menu:
   首页: / || fas fa-home
-  归档: /archives/ || fas fa-archive
+  文章: /archives/ || fas fa-archive
   标签: /tags/ || fas fa-tags
   分类: /categories/ || fas fa-folder-open
   娱乐||fas fa-list:
@@ -839,6 +839,7 @@ css_prefix: true
 inject:
   head:
     # - <link rel="stylesheet" href="/xxx.css">
+    - <link rel="stylesheet" href="/css/custom.css">
   bottom:
     # - <script src="xxxx"></script>
 
