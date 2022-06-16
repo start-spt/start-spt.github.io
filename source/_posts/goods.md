@@ -14,7 +14,6 @@ cover: https://static01.imgkr.com/temp/4c6bea558ba749a2b626abc0a8f72acd.png
 物品名 | 价格(元)
 --- | ---
 [图一](#img1),餐桌   | 40 
-[图一](#img1),餐椅   | 20
 [图二](#img2),床(宽150cm)     | 100
 [图二](#img2),柜子   | 随床赠送,单买50
 [图二](#img2),椅子   | 60
