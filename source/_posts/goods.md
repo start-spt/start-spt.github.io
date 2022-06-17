@@ -5,7 +5,7 @@ tags:
 - goods
 categories:
 - 日常
-cover: https://static01.imgkr.com/temp/4c6bea558ba749a2b626abc0a8f72acd.png
+cover: https://tse1-mm.cn.bing.net/th/id/R-C.d42c888a14bef85311a5742cc9d25625?rik=316lPQjuCJjtKQ&pid=ImgRaw&r=0
 
 ---
 

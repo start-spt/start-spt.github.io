@@ -126,6 +126,8 @@ cover:
     - https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg
     - https://fastly.jsdelivr.net/gh/jerryc127/CDN@latest/cover/default_bg.png
     - https://fastly.jsdelivr.net/gh/jerryc127/CDN@latest/Photo/friends.jpg
+    - https://pic1.zhimg.com/v2-d58ce10bf4e01f5086c604a9cfed29f3_r.jpg
+    - https://tse1-mm.cn.bing.net/th/id/R-C.d42c888a14bef85311a5742cc9d25625?rik=316lPQjuCJjtKQ&pid=ImgRaw&r=0
 
 # Replace Broken Images (替換無法顯示的圖片)
 error_img:
