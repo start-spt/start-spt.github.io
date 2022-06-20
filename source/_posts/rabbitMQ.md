@@ -210,7 +210,7 @@ public class FanoutSender {
     }
 }
 ```
-#### 接收者代码:
+### 接收者代码:
 ```java
 @Component
 public class FanoutReceiver {
@@ -243,7 +243,7 @@ public class MsgController {
     }
 }
 ```
-#### 消息数据类
+### 消息数据类
 ```java
 public class MsgDto implements Serializable {
 
