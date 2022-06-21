@@ -415,12 +415,15 @@ public class SendMsgEvent {
 ![2022-06-20_req_postman](./rabbitMQ/2022-06-20_req_postman.png)
 
 ## 结果
-### localhost:8001/msg/send请求到服务mq_rabbit上,mq_rabbit发送消息,监听消息,判断是"自己"发的后,不转发
+### mq_rabbit01
+>localhost:8001/msg/send请求到服务mq_rabbit上,mq_rabbit发送消息,监听消息,判断是"自己"发的后,不转发
 
 ![2022-06-20_22-01](./rabbitMQ/2022-06-20_22-01.png)
-### mq_rabbit02,监听消息,判断消息不是"自己"发的后,转发
+### mq_rabbit02
+>mq_rabbit02,监听消息,判断消息不是"自己"发的后,转发
 
 ![2022-06-20_22-02](./rabbitMQ/2022-06-20_22-02.png)
-### mq_rabbit03,监听消息,判断消息不是"自己"发的后,转发
+### mq_rabbit03
+>mq_rabbit03,监听消息,判断消息不是"自己"发的后,转发
 
 ![2022-06-20_22-03](./rabbitMQ/2022-06-20_22-03.png)
