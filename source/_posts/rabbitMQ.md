@@ -143,6 +143,7 @@ spring:
  - **password** : 密码
  - **username** : 用户名
  - **virtualHost** : 虚拟消息服务器 (每个VirtualHost相当于一个相对独立的RabbitMQ服务器；每个VirtualHost之间是相互隔离的，exchange、queue、message不能互通。 )
+
 >RabbitMQ配置参数详解:
 ```properties
 #基础信息
@@ -232,7 +233,7 @@ spring.rabbitmq.template.retry.max-interval=10000: 最大重试时间间隔
  ```
  - 父模块引入spring-boot-dependencies确定版本后,子模块不写版本号,会使用默认版本
 ![2022-06-20_model_mvn](./rabbitMQ/2022-06-20_model_mvn.png)
-## 2.2 配置MQ
+## 配置MQ
 ```java
 @Configuration
 public class RabbitConfig {
@@ -264,7 +265,7 @@ public class RabbitConfig {
 - 这里使用了rabbitMQ的fanout模式:
 ![2022-06-20_rabbit_fanout](./rabbitMQ/2022-06-20_rabbit_fanout.png)
 > **Fanout** :  这种类型非常简单。正如从名称中猜到的那样，它是将接收到的所有消息广播到它知道的 所有队列中。系统中默认有些exchange 类型
-## 2.3 发送者和接受者
+## 发送者和接受者
 ### 发送者代码:
 ```java
 @Component
@@ -305,7 +306,7 @@ public class FanoutReceiver {
 ```
 - 请注意 **MSG_FROM** 该静态变量是一个标识,标识消息从哪个应用发出,在接收消息时,判断消息是否为"自己"发出的,是:不转发,否:转发
 
-## 2.4 具体业务类
+## 具体业务类
 ### api : 
 ```java
 @RestController
@@ -404,16 +405,16 @@ public class SendMsgEvent {
 }
 ```
 至此,springBoot整合MQ部分完毕
-# 三.运行&结果
+# 运行&结果
 > 同样的方式,创建子模块:mq_rabbit02,mq_rabbit03  (记得修改yml文件哟~~)
-## 3.1 运行
+## 运行
 #### 运行项目
 ![2022-06-20_run](./rabbitMQ/2022-06-20_run.png)
 
 #### 发送消息
 ![2022-06-20_req_postman](./rabbitMQ/2022-06-20_req_postman.png)
 
-## 3.2 结果
+## 结果
 >  localhost:8001/msg/send请求到服务mq_rabbit上,mq_rabbit发送消息,监听消息,判断是"自己"发的后,不转发
 
 ![2022-06-20_22-01](./rabbitMQ/2022-06-20_22-01.png)
