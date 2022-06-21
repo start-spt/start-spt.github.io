@@ -5,7 +5,7 @@ tags:
  - MQ
 categories:
  - 分布式
-cover: https://mmbiz.qpic.cn/mmbiz_jpg/2kWC7ftZ4c9fjLYY6WvkKzyf5QWicAaTk602eprBuk70ZnpXkRd8eDbE0aASnmvU7Ia7ibNZDhoGx3TkHUlEApqg/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1&wx_co=1
+cover: https://bbsfiles.vivo.com.cn/vivobbs/attachment/forum/201707/25/081816q9kzfjqo8h8zvxjx.jpg
 ---
 
 # 一.项目结构
