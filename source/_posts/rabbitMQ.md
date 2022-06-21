@@ -136,7 +136,7 @@ spring:
     username: admin
     virtualHost: /
 ```
->参数解释
+#### 参数解释
  
  - **host** : rabbitMQ服务的地址
  - **port** : rabbitMQ服务的端口 (5672为mq应用访问端口,15672为web访问端口)
@@ -144,7 +144,7 @@ spring:
  - **username** : 用户名
  - **virtualHost** : 虚拟消息服务器 (每个VirtualHost相当于一个相对独立的RabbitMQ服务器；每个VirtualHost之间是相互隔离的，exchange、queue、message不能互通。 )
 
->RabbitMQ配置参数详解:
+#### RabbitMQ配置参数详解:
 ```properties
 #基础信息
 spring.rabbitmq.host: 默认localhost
