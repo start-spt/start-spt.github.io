@@ -136,7 +136,7 @@ spring:
     username: admin
     virtualHost: /
 ```
-#### 参数解释
+### 参数解释
  
  - **host** : rabbitMQ服务的地址
  - **port** : rabbitMQ服务的端口 (5672为mq应用访问端口,15672为web访问端口)
@@ -144,7 +144,7 @@ spring:
  - **username** : 用户名
  - **virtualHost** : 虚拟消息服务器 (每个VirtualHost相当于一个相对独立的RabbitMQ服务器；每个VirtualHost之间是相互隔离的，exchange、queue、message不能互通。 )
 
-#### RabbitMQ配置参数详解:
+### RabbitMQ配置参数详解:
 ```properties
 #基础信息
 spring.rabbitmq.host: 默认localhost
@@ -408,19 +408,19 @@ public class SendMsgEvent {
 # 运行&结果
 > 同样的方式,创建子模块:mq_rabbit02,mq_rabbit03  (记得修改yml文件哟~~)
 ## 运行
-#### 运行项目
+### 运行项目
 ![2022-06-20_run](./rabbitMQ/2022-06-20_run.png)
 
-#### 发送消息
+### 发送消息
 ![2022-06-20_req_postman](./rabbitMQ/2022-06-20_req_postman.png)
 
 ## 结果
->  localhost:8001/msg/send请求到服务mq_rabbit上,mq_rabbit发送消息,监听消息,判断是"自己"发的后,不转发
+### localhost:8001/msg/send请求到服务mq_rabbit上,mq_rabbit发送消息,监听消息,判断是"自己"发的后,不转发
 
 ![2022-06-20_22-01](./rabbitMQ/2022-06-20_22-01.png)
-> mq_rabbit02,监听消息,判断消息不是"自己"发的后,转发
+### mq_rabbit02,监听消息,判断消息不是"自己"发的后,转发
 
 ![2022-06-20_22-02](./rabbitMQ/2022-06-20_22-02.png)
-> mq_rabbit03,监听消息,判断消息不是"自己"发的后,转发
+### mq_rabbit03,监听消息,判断消息不是"自己"发的后,转发
 
 ![2022-06-20_22-03](./rabbitMQ/2022-06-20_22-03.png)
