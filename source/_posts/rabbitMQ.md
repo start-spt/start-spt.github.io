@@ -5,7 +5,7 @@ tags:
  - MQ
 categories:
  - 分布式
-cover: https://bbsfiles.vivo.com.cn/vivobbs/attachment/forum/201707/25/081816q9kzfjqo8h8zvxjx.jpg
+cover: https://gitee.com/start-spt/image_repository/raw/master/blog_images/cover-20220623.jpg
 ---
 
 # 项目结构
