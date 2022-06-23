@@ -5,7 +5,7 @@ tags:
  - MQ
 categories:
  - 分布式
-cover: https://gitee.com/start-spt/image_repository/raw/master/blog_images/cover-20220623.jpg
+cover: https://cdn.jsdelivr.net/gh/start-spt/Photo/cover-20220623.jpg
 ---
 
 # 项目结构
