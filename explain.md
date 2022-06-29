@@ -39,3 +39,6 @@ bing每日图片:http://blog.fzdslr.cn/2020-04-14-BINGPICTURES
 
 4.https://cloud.tencent.com/developer/article/1858753
 
+免费图床:
+
+https://sm.ms/
