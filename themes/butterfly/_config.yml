@@ -87,10 +87,10 @@ avatar:
 disable_top_img: false
 
 # The banner image of home page
-index_img: https://cdn.jsdelivr.net/gh/weilain/cdn-photo/Photo/archive_img.jpg
+index_img: https://s2.loli.net/2022/07/01/HLk8QTgiIl1zrcU.webp
 
 # If the banner of page not setting, it will show the top_img
-default_top_img: https://fastly.jsdelivr.net/gh/jerryc127/CDN@latest/Photo/messageboard.jpg
+default_top_img: https://s2.loli.net/2022/07/01/Mxli32wTerzfIYj.jpg
 
 # The banner image of archive page
 archive_img:
