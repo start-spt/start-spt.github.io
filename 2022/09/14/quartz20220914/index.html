@@ -1,0 +1,408 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>深入Quartz，更优雅地管理你的定时任务 | Utopia</title><meta name="keywords" content="quartz"><meta name="author" content="Peter"><meta name="copyright" content="Peter"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="初识Quartz  Quartz基础使用  基于时间间隔的定时任务  基于Cron表达式的定时任务    Quartz解读  Job  Trigger  Scheduler    Quartz进阶使用  多触发器的定时任务  Job中注入Bean  Quartz的持久化     最近在工作遇到了定时任务场景，因此特地对定时任务相关知识进行了调研，记录在此，后文中使用的代码已经上传到Github：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入Quartz，更优雅地管理你的定时任务">
+<meta property="og:url" content="https://start-spt.github.io/2022/09/14/quartz20220914/index.html">
+<meta property="og:site_name" content="Utopia">
+<meta property="og:description" content="初识Quartz  Quartz基础使用  基于时间间隔的定时任务  基于Cron表达式的定时任务    Quartz解读  Job  Trigger  Scheduler    Quartz进阶使用  多触发器的定时任务  Job中注入Bean  Quartz的持久化     最近在工作遇到了定时任务场景，因此特地对定时任务相关知识进行了调研，记录在此，后文中使用的代码已经上传到Github：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2022-09-14T07:44:04.000Z">
+<meta property="article:modified_time" content="2022-09-14T09:17:43.482Z">
+<meta property="article:author" content="Peter">
+<meta property="article:tag" content="quartz">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://start-spt.github.io/2022/09/14/quartz20220914/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '深入Quartz，更优雅地管理你的定时任务',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-09-14 17:17:43'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/meting@1.2/dist/Meting.min.js"></script><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://butterfly.js.org/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Utopia</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">深入Quartz，更优雅地管理你的定时任务</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-09-14T07:44:04.000Z" title="发表于 2022-09-14 15:44:04">2022-09-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-09-14T09:17:43.482Z" title="更新于 2022-09-14 17:17:43">2022-09-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/">java</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="深入Quartz，更优雅地管理你的定时任务"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><ul>
+<li><p>初识Quartz</p>
+</li>
+<li><p>Quartz基础使用</p>
+<ul>
+<li><p>基于时间间隔的定时任务</p>
+</li>
+<li><p>基于Cron表达式的定时任务</p>
+</li>
+</ul>
+</li>
+<li><p>Quartz解读</p>
+<ul>
+<li><p>Job</p>
+</li>
+<li><p>Trigger</p>
+</li>
+<li><p>Scheduler</p>
+</li>
+</ul>
+</li>
+<li><p>Quartz进阶使用</p>
+<ul>
+<li><p>多触发器的定时任务</p>
+</li>
+<li><p>Job中注入Bean</p>
+</li>
+<li><p>Quartz的持久化</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>最近在工作遇到了定时任务场景，因此特地对定时任务相关知识进行了调研，记录在此，后文中使用的代码已经上传到Github：<a target="_blank" rel="noopener" href="https://github.com/ThinkMugz/springboot-demo-major%EF%BC%8C%E9%9C%80%E8%A6%81%E7%9A%84%E4%BC%99%E4%BC%B4%E5%84%BF%E8%87%AA%E5%8F%96%E3%80%82">https://github.com/ThinkMugz/springboot-demo-major，需要的伙伴儿自取。</a></p>
+<p>本文主要有以下内容：</p>
+<ul>
+<li><p>Quartz的基本认知和源码初探</p>
+</li>
+<li><p>Quartz的基本使用</p>
+</li>
+<li><p>Quartz的进阶使用，包括Job中注入Mapper层、Quartz的持久化</p>
+</li>
+</ul>
+<p>在Java领域，有很多定时任务框架，这里简单对比一下目前比较流行的三款：</p>
+<p><img src="/2022/09/14/quartz20220914/saved_resource" alt="saved_resource"></p>
+<center>网络资源</center>
+
+<ul>
+<li><p>Quartz文档：<a target="_blank" rel="noopener" href="https://www.w3cschool.cn/quartz/_doc/">https://www.w3cschool.cn/quartz\_doc/</a></p>
+</li>
+<li><p>xxl-job博客：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/xuxueli/p/5021979.html">https://www.cnblogs.com/xuxueli/p/5021979.html</a></p>
+</li>
+</ul>
+<p>1 初识Quartz</p>
+<p>如果你的定时任务没有分布式需求，但需要对任务有一定的动态管理，例如任务的启动、暂停、恢复、停止和触发时间修改，那么Quartz非常适合你。</p>
+<p>Quartz是Java定时任务领域一个非常优秀的框架，由OpenSymphony（一个开源组织）开发，这个框架进行了优良地解耦设计，整个模块可以分为三大部分：</p>
+<ul>
+<li><p><strong>Job</strong>：顾名思义，指待定时执行的具体工作内容；</p>
+</li>
+<li><p><strong>Trigger</strong>：触发器，指定运行参数，包括运行次数、运行开始时间和技术时间、运行时长等；</p>
+</li>
+<li><p><strong>Scheduler</strong>：调度器，将Job和Trigger组装起来，使定时任务被真正执行；</p>
+</li>
+</ul>
+<p><img src="/2022/09/14/quartz20220914/saved_resource(1)" alt="saved_resource(1)"><br>下面这个图简略地描述了三者之间的关系：</p>
+<ul>
+<li><p>一个JobDetail（Job的实现类）可以绑定多个Trigger，但一个Trigger只能绑定一个JobDetail；</p>
+</li>
+<li><p>每个JobDetail和Trigger通过group和name来标识唯一性；</p>
+</li>
+<li><p>一个Scheduler可以调度多组JobDetail和Trigger。</p>
+</li>
+</ul>
+<p><img src="/2022/09/14/quartz20220914/saved_resource(2)" alt="saved_resource(2)"></p>
+<p>为了便于理解和记忆，可以把这套设计机制与工厂车间相关联：</p>
+<ul>
+<li><p><strong>Job</strong>：把Job比作车间要生产的一类产品，例如汽车、电脑等。</p>
+</li>
+<li><p><strong>Trigger</strong>：trigger可以理解为一条生产线，一条生产线只能生产一类产品，但一类产品可以由多条生产线生产。</p>
+</li>
+<li><p><strong>Scheduler</strong>：Scheduler则可以理解为车间主任，指挥调度着车间内的生产任务（Scheduler内置线程池，线程池内的工作线程即为车间工人，每个工人承担着一组任务的真正执行）。</p>
+</li>
+</ul>
+<p><img src="/2022/09/14/quartz20220914/saved_resource(3)" alt="saved_resource(3)"></p>
+<p>Quartz基础使用</p>
+<p>Quartz提供了丰富的API，下面我们在Springboot中使用Quartz完成一些简单的demo。</p>
+<p>2.1 基于时间间隔的定时任务</p>
+<p>基于时间间隔和时间长度实现定时任务，借助SimpleTrigger，例如这个场景——每隔2s在控制台输出线程名和当前时间，持续30s。</p>
+<p>1.导入依赖：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.springframework.bootgroupId\&gt;spring-boot-starter-quartzartifactId\&gt;dependency\&gt;</span><br></pre></td></tr></table></figure>
+
+<p>2.新建Job，实现我们想要定时执行的任务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import org.quartz.Job;import org.quartz.JobExecutionContext;import</span><br><span class="line">java.time.LocalDateTime;import java.time.format.DateTimeFormatter;</span><br><span class="line"></span><br><span class="line">public class SimpleJob implements Job &#123;\@Overridepublic void</span><br><span class="line">execute(JobExecutionContext jobExecutionContext) &#123;//</span><br><span class="line">创建一个事件，下面仅创建一个输出语句作演示System.out.println(Thread.currentThread().getName()</span><br><span class="line">+ \&quot;\--\&quot;+ DateTimeFormatter.ofPattern(\&quot;yyyy-MM-dd</span><br><span class="line">HH:mm:ss\&quot;).format(LocalDateTime.now()));&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.创建Scheduler和Trigger，执行定时任务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import com.quartz.demo.schedule.SimpleJob;import</span><br><span class="line">org.junit.jupiter.api.Test;import org.quartz.\*;import</span><br><span class="line">org.quartz.impl.StdSchedulerFactory;</span><br><span class="line"></span><br><span class="line">import java.util.Date;import java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">public class SimpleQuartzTest &#123;/\*\*</span><br><span class="line">基于时间间隔的定时任务\*/\@Testpublic void simpleTest() throws</span><br><span class="line">SchedulerException, InterruptedException &#123;//</span><br><span class="line">1、创建Scheduler（调度器）SchedulerFactory schedulerFactory = new</span><br><span class="line">StdSchedulerFactory();Scheduler scheduler =</span><br><span class="line">schedulerFactory.getScheduler();//</span><br><span class="line">2、创建JobDetail实例，并与SimpleJob类绑定(Job执行内容)JobDetail</span><br><span class="line">jobDetail = JobBuilder.newJob(SimpleJob.class).withIdentity(\&quot;job1\&quot;,</span><br><span class="line">\&quot;group1\&quot;).build();//</span><br><span class="line">3、构建Trigger（触发器），定义执行频率和时长Trigger trigger =</span><br><span class="line">TriggerBuilder.newTrigger()//</span><br><span class="line">指定group和name，这是唯一身份标识.withIdentity(\&quot;trigger-1\&quot;,</span><br><span class="line">\&quot;trigger-group\&quot;).startNow()</span><br><span class="line">//立即生效.withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(2)</span><br><span class="line">//每隔2s执行一次.repeatForever()) //</span><br><span class="line">永久执行.build();//4、将Job和Trigger交给Scheduler调度scheduler.scheduleJob(jobDetail,</span><br><span class="line">trigger);// 5、启动Schedulerscheduler.start();//</span><br><span class="line">休眠，决定调度器运行时间，这里设置30sTimeUnit.SECONDS.sleep(30);//</span><br><span class="line">关闭Schedulerscheduler.shutdown();&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>启动测试方法后，控制台观察现象即可。注意到这么一句日志：Using thread<br>pool &#39;org.quartz.simpl.SimpleThreadPool&#39; - with 10<br>threads.，这说明Scheduler确实是内置了10个线程的线程池，通过打印线程名也印证了这一点。</p>
+<p>另外要尤其注意的是，我们之所以通过TimeUnit.SECONDS.sleep(30);设置休眠，是因为定时任务是交由线程池异步执行的，而测试方法运行结束，主线程随之结束导致定时任务也不再执行了，所以需要设置休眠hold住主线程。在真实项目中，项目的进程是一直存活的，因此不需要设置休眠时间。</p>
+<p>这其中的区别可以参考</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/ThinkMugz/springboot-demo-major%E3%80%82">https://github.com/ThinkMugz/springboot-demo-major。</a></p>
+</blockquote>
+<p>2.2 基于Cron表达式的定时任务</p>
+<p>基于Cron表达式的定时任务demo如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import com.quartz.demo.schedule.SimpleJob;import</span><br><span class="line">org.junit.jupiter.api.Test;import org.quartz.\*;import</span><br><span class="line">org.quartz.impl.StdSchedulerFactory;import</span><br><span class="line">java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">public class SimpleQuartzTest &#123;</span><br><span class="line"></span><br><span class="line">/\*\* 基于cron表达式的定时任务\*/\@Testpublic void cronTest() throws</span><br><span class="line">SchedulerException, InterruptedException &#123;//</span><br><span class="line">1、创建Scheduler（调度器）SchedulerFactory schedulerFactory = new</span><br><span class="line">StdSchedulerFactory();Scheduler scheduler =</span><br><span class="line">schedulerFactory.getScheduler();//</span><br><span class="line">2、创建JobDetail实例，并与SimpleJob类绑定JobDetail jobDetail =</span><br><span class="line">JobBuilder.newJob(SimpleJob.class).withIdentity(\&quot;job-1\&quot;,</span><br><span class="line">\&quot;job-group\&quot;).build();//</span><br><span class="line">3、构建Trigger（触发器），定义执行频率和时长CronTrigger cronTrigger =</span><br><span class="line">TriggerBuilder.newTrigger().withIdentity(\&quot;trigger-1\&quot;,</span><br><span class="line">\&quot;trigger-group\&quot;).startNow()</span><br><span class="line">//立即生效.withSchedule(CronScheduleBuilder.cronSchedule(\&quot;\* 30 10 ? \*</span><br><span class="line">1/5 \*\&quot;)).build();</span><br><span class="line"></span><br><span class="line">//4、执行scheduler.scheduleJob(jobDetail,</span><br><span class="line">cronTrigger);scheduler.start();//</span><br><span class="line">休眠，决定调度器运行时间，这里设置30sTimeUnit.SECONDS.sleep(30);//</span><br><span class="line">关闭Schedulerscheduler.shutdown();&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3 Quartz解读</p>
+<p>整个Quartz体系涉及的类及之间的关系如下图所示：</p>
+<p><img src="/2022/09/14/quartz20220914/saved_resource(4)" alt="saved_resource(4)"></p>
+<ul>
+<li><p><strong>JobDetail</strong>：Job接口的实现类，由JobBuilder将具体定义任务的类包装而成。</p>
+</li>
+<li><p><strong>Trigger</strong>：触发器，定义定时任务的触发规则，包括执行间隔、时长等，使用    TriggerBuilder创建，JobDetail和Trigger可以一对多，反之不可。触发器可以拥有多种状态。</p>
+</li>
+<li><p><strong>Scheduler</strong>：调度器，将Job和Trigger组装起来，使定时任务被真正执行；是Quartz的核心，提供了大量API。</p>
+</li>
+<li><p><strong>JobDataMap</strong>：集成Map，通过键值对为JobDetail存储一些额外信息。</p>
+</li>
+<li><p><strong>JobStore</strong>：用来存储任务和触发器相关的信息，例如任务名称、数量、状态等等。Quartz<br>中有两种存储任务的方式，一种在在内存（RAMJobStore），一种是在数据库（JDBCJobStore）。</p>
+</li>
+</ul>
+<p>3.1 Job</p>
+<p>Job是一个接口，只有一个方法execute()，我们创建具体的任务类时要继承Job并重写execute()方法，使用JobBuilder将具体任务类包装成一个JobDetail（使用了建造者模式）交给Scheduler管理。每个JobDetail由name和group作为其唯一身份标识。</p>
+<ul>
+<li><p>JobDataMap中可以包含不限量的（序列化的）数据对象，在job实例执行的时候，可以使用其中的数据。</p>
+</li>
+<li><p>JobDataMap继承Map，可通过键值对为JobDetail存储一些额外信息。</p>
+</li>
+</ul>
+<p>3.2 Trigger</p>
+<p>Trigger有四类实现，分别如下：</p>
+<ul>
+<li><p><strong>SimpleTrigger</strong>：简单触发器，支持定义任务执行的间隔时间，执行次数的规则有两种，一是定义重复次数，二是定义开始时间和结束时间。如果同时设置了结束时间与重复次数，先结束的会覆盖后结束的，以先结束的为准。</p>
+</li>
+<li><p><strong>CronTrigger</strong>：基于Cron表达式的触发器。</p>
+</li>
+<li><p><strong>CalendarIntervalTrigger</strong>：基于日历的触发器，比简单触发器更多时间单位，且能智能区分大小月和平闰年。</p>
+</li>
+<li><p><strong>DailyTimeIntervalTrigger</strong>：基于日期的触发器，如每天的某个时间段。</p>
+</li>
+</ul>
+<p>Trigger是有状态的：NONE,NORMAL,PAUSED,COMPLETE,ERROR,BLOCKED，状态之间转换关系：</p>
+<p><img src="/2022/09/14/quartz20220914/saved_resource(5)" alt="saved_resource(5)"><br>COMPLETE状态比较特殊，我在实际操作中发现，当Trigger长时间暂停后（具体时长不太确定）再恢复，状态就会变为COMPLETE，这种状态下无法再次启动该触发器。</p>
+<p>3.3 Scheduler</p>
+<p>调度器，是 Quartz<br>的指挥官，由StdSchedulerFactory产生，它是单例的。Scheduler中提供了Quartz中最重要的<br>API，默认是实现类是StdScheduler。</p>
+<p>Scheduler中主要的API大概分为三种：</p>
+<ul>
+<li><p><strong>操作Scheduler本身</strong>：例如start、shutdown等；</p>
+</li>
+<li><p><strong>操作Job</strong>：例如：addJob、pauseJob、pauseJobs、resumeJob、resumeJobs、getJobKeys、getJobDetail等</p>
+</li>
+<li><p><strong>操作Trigger</strong>：例如pauseTrigger、resumeTrigger等</p>
+</li>
+</ul>
+<p>这些API使用非常简单，源码中也有完善的注释，这里不再赘述。</p>
+<p>4 Quartz进阶使用</p>
+<p>除了基本使用外，Quartz还有一些较为复杂的应用场景。</p>
+<p>4.1 多触发器的定时任务</p>
+<p>前文提过，一个JobDetail可以绑定多个触发器，这种场景还是有一些注意点的：</p>
+<ul>
+<li><p>首先，要通过storeDurably()方法将JobDetail设置为孤立后保存存储（没有触发器指向该作业的情况）；</p>
+</li>
+<li><p>Scheduler通过addJob()将给定的作业添加到计划程序中-没有关联的触发器。作业将处于”休眠”状态，直到使用触发器或调度程序对其进行调度；</p>
+</li>
+<li><p>触发器通过forJob(JobDetail<br>jobDetail)指定要绑定的JobDetail，scheduleJob()方法只传入触发器，触发后将自动执行addJob过的绑定JobDetail。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import com.quartz.demo.schedule.SimpleJob;import</span><br><span class="line">org.junit.jupiter.api.Test;import org.quartz.\*;import</span><br><span class="line">org.quartz.impl.StdSchedulerFactory;import</span><br><span class="line">java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">public class MultiQuartzTest &#123;</span><br><span class="line"></span><br><span class="line">\@Testpublic void multiJobTest() throws SchedulerException,</span><br><span class="line">InterruptedException &#123;// 1、创建Scheduler（调度器）SchedulerFactory</span><br><span class="line">schedulerFactory = new StdSchedulerFactory();Scheduler scheduler =</span><br><span class="line">schedulerFactory.getScheduler();//</span><br><span class="line">2、创建JobDetail实例，与执行内容类SimpleJob绑定，注意要设置</span><br><span class="line">.storeDurably()，否则报错JobDetail jobDetail =</span><br><span class="line">JobBuilder.newJob(SimpleJob.class).withIdentity(\&quot;job1\&quot;,</span><br><span class="line">\&quot;job-group\&quot;).storeDurably().build();</span><br><span class="line"></span><br><span class="line">// 3、分别构建Trigger实例Trigger trigger =</span><br><span class="line">TriggerBuilder.newTrigger().withIdentity(\&quot;trigger1\&quot;,</span><br><span class="line">\&quot;trigger-group\&quot;).startNow()//立即生效.forJob(jobDetail).withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(2)</span><br><span class="line">//每隔3s执行一次.repeatForever()) // 永久循环.build();Trigger trigger2 =</span><br><span class="line">TriggerBuilder.newTrigger().withIdentity(\&quot;trigger2\&quot;,</span><br><span class="line">\&quot;trigger-group\&quot;).startNow()//立即生效.forJob(jobDetail).withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(3)</span><br><span class="line">//每隔5s执行一次.repeatForever()).build(); //</span><br><span class="line">永久循环//4、调度器中添加jobscheduler.addJob(jobDetail,</span><br><span class="line">false);scheduler.scheduleJob(trigger);scheduler.scheduleJob(trigger2);//</span><br><span class="line">启动调度器scheduler.start();//</span><br><span class="line">休眠任务执行时长TimeUnit.SECONDS.sleep(20);scheduler.shutdown();&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>4.2 Job中注入Bean</p>
+</li>
+</ul>
+<p>有时候，我们要在定时任务中操作数据库，但Job中无法直接注入数据层，解决这种问题，有两种解决方案。</p>
+<p>方案一：借助JobDataMap</p>
+<p>在构建JobDetail时，可以将数据放入JobDataMap，基本类型的数据通过usingJobData方法直接放入，mapper这种类型数据手动put进去：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Autowiredprivate PersonMapper personMapper;</span><br><span class="line"></span><br><span class="line">// 构建定时任务JobDetail jobDetail =</span><br><span class="line">JobBuilder.newJob(MajorJob.class).withIdentity(jobName,</span><br><span class="line">jobGroupName).usingJobData(\&quot;jobName\&quot;, \&quot;QuartzDemo\&quot;).build();//</span><br><span class="line">将mapper放入jobDetail的jobDataMap中jobDetail.getJobDataMap().put(\&quot;personMapper\&quot;,</span><br><span class="line">personMapper);</span><br></pre></td></tr></table></figure>
+<p>在job的执行过程中，可以从JobDataMap中取出数据，如下示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import com.quartz.demo.entity.Person;import</span><br><span class="line">com.quartz.demo.mapper.PersonMapper;import org.quartz.Job;import</span><br><span class="line">org.quartz.JobDataMap;import org.quartz.JobExecutionContext;</span><br><span class="line"></span><br><span class="line">import java.time.LocalDateTime;import</span><br><span class="line">java.time.format.DateTimeFormatter;import java.util.List;</span><br><span class="line"></span><br><span class="line">public class MajorJob implements Job &#123;\@Overridepublic void</span><br><span class="line">execute(JobExecutionContext jobExecutionContext) &#123;JobDataMap dataMap =</span><br><span class="line">jobExecutionContext.getJobDetail().getJobDataMap();String jobName =</span><br><span class="line">dataMap.getString(\&quot;jobName\&quot;);PersonMapper personMapper =</span><br><span class="line">(PersonMapper) dataMap.get(\&quot;personMapper\&quot;);//</span><br><span class="line">这样就可以执行mapper层方法了List personList = personMapper.queryList();</span><br><span class="line"></span><br><span class="line">System.out.println(Thread.currentThread().getName() + \&quot;\--\&quot;+</span><br><span class="line">DateTimeFormatter.ofPattern( \&quot;yyyy-MM-dd</span><br><span class="line">HH:mm:ss\&quot;).format(LocalDateTime.now()) + \&quot;\--\&quot;+ jobName + \&quot;\--\&quot; +</span><br><span class="line">personList);&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方案相对简单，但在持久化中会遇到mapper的序列化问题：</p>
+<blockquote>
+<p>java.io.NotSerializableException: Unable to serialize JobDataMap for<br>insertion into database because the value of property &#39;personMapper&#39;<br>is not serializable: org.mybatis.spring.SqlSessionTemplate</p>
+</blockquote>
+<p>方案二：静态工具类</p>
+<p>创建工具类SpringContextJobUtil，实现ApplicationContextAware接口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">import org.springframework.beans.BeansException;import</span><br><span class="line">org.springframework.context.ApplicationContext;import</span><br><span class="line">org.springframework.context.ApplicationContextAware;import</span><br><span class="line">org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">import java.util.Locale;</span><br><span class="line"></span><br><span class="line">\@Componentpublic class SpringContextJobUtil implements</span><br><span class="line">ApplicationContextAware &#123;private static ApplicationContext context;</span><br><span class="line"></span><br><span class="line">\@Override\@SuppressWarnings(\&quot;static-access\&quot;)public void</span><br><span class="line">setApplicationContext(ApplicationContext contex) throws BeansException</span><br><span class="line">&#123;this.context = contex;&#125;</span><br><span class="line"></span><br><span class="line">/\*\*\* 根据name获取bean\*\* \@param beanName name\* \@return</span><br><span class="line">bean对象\*/public static Object getBean(String beanName) &#123;return</span><br><span class="line">context.getBean(beanName);&#125;</span><br><span class="line"></span><br><span class="line">public static String getMessage(String key) &#123;return</span><br><span class="line">context.getMessage(key, null, Locale.getDefault());&#125;&#125;</span><br><span class="line"></span><br><span class="line">mapper类上打上\@Service注解，并赋予其name：</span><br><span class="line"></span><br><span class="line">\@Service(\&quot;personMapper\&quot;)public interface PersonMapper</span><br><span class="line">&#123;\@Select(\&quot;select id,name,age,sex,address,sect,skill,power,create\_time</span><br><span class="line">createTime,modify\_time modifyTime from mytest.persons\&quot;)List queryList</span><br><span class="line">() ;&#125;</span><br><span class="line"></span><br><span class="line">Job中通过SpringContextJobUtil的getBean获取mapper的bean：</span><br><span class="line"></span><br><span class="line">public class MajorJob implements Job &#123;\@Overridepublic void</span><br><span class="line">execute(JobExecutionContext jobExecutionContext) &#123;JobDataMap dataMap =</span><br><span class="line">jobExecutionContext.getJobDetail().getJobDataMap();String jobName =</span><br><span class="line">dataMap.getString(\&quot;jobName\&quot;);</span><br><span class="line"></span><br><span class="line">PersonMapper personMapper = (PersonMapper)</span><br><span class="line">SpringContextJobUtil.getBean(\&quot;personMapper\&quot;);List personList =</span><br><span class="line">personMapper.queryList();</span><br><span class="line"></span><br><span class="line">System.out.println(Thread.currentThread().getName() + \&quot;\--\&quot;+</span><br><span class="line">DateTimeFormatter.ofPattern( \&quot;yyyy-MM-dd</span><br><span class="line">HH:mm:ss\&quot;).format(LocalDateTime.now()) + \&quot;\--\&quot;+ jobName + \&quot;\--\&quot; +</span><br><span class="line">personList);&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>推荐使用这个方法。</p>
+<p>4.3 Quartz的持久化</p>
+<p>定时任务的诸多要素，如任务名称、数量、状态、运行频率、运行时间等，是要存储起来的。JobStore，就是用来存储任务和触发器相关的信息的。</p>
+<p>Quartz<br>中有两种存储任务的方式，一种在在内存（RAMJobStore），一种是在数据库（JDBCJobStore）。</p>
+<p>Quartz<br>默认的JobStore是RAMJobstore，也就是把任务和触发器信息运行的信息存储在内存中，用到了HashMap、TreeSet、HashSet等等数据结构，如果程序崩溃或重启，所有存储在内存中的数据都会丢失。所以我们需要把这些数据持久化到磁盘。</p>
+<p>实现Quartz的持久化并不困难，按下列步骤操作即可：</p>
+<p>1.添加相关依赖：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.mchangegroupId\&gt;c3p0artifactId\&gt;0.9.5.2version\&gt;dependency\&gt;</span><br></pre></td></tr></table></figure>
+<p>2.编写配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import org.quartz.Scheduler;import</span><br><span class="line">org.quartz.ee.servlet.QuartzInitializerListener;import</span><br><span class="line">org.springframework.beans.factory.config.PropertiesFactoryBean;import</span><br><span class="line">org.springframework.context.annotation.Bean;import</span><br><span class="line">org.springframework.context.annotation.Configuration;import</span><br><span class="line">org.springframework.core.io.ClassPathResource;import</span><br><span class="line">org.springframework.scheduling.quartz.SchedulerFactoryBean;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;import java.util.Properties;</span><br><span class="line"></span><br><span class="line">/\*\*\* \@author muguozheng\* \@version 1.0.0\* \@createTime 2022/4/19</span><br><span class="line">18:46\* \@description Quartz配置\*/\@Configurationpublic class</span><br><span class="line">SchedulerConfig &#123;/\*\*\* 读取quartz.properties,将值初始化\*\* \@return</span><br><span class="line">Properties\* \@throws IOException io\*/\@Beanpublic Properties</span><br><span class="line">quartzProperties() throws IOException &#123;PropertiesFactoryBean</span><br><span class="line">propertiesFactoryBean = new</span><br><span class="line">PropertiesFactoryBean();propertiesFactoryBean.setLocation(new</span><br><span class="line">ClassPathResource(\&quot;/quartz.properties\&quot;));propertiesFactoryBean.afterPropertiesSet();return</span><br><span class="line">propertiesFactoryBean.getObject();&#125;</span><br><span class="line"></span><br><span class="line">/\*\*\* 将配置文件的数据加载到SchedulerFactoryBean中\*\* \@return</span><br><span class="line">SchedulerFactoryBean\* \@throws IOException io\*/\@Beanpublic</span><br><span class="line">SchedulerFactoryBean schedulerFactoryBean() throws IOException</span><br><span class="line">&#123;SchedulerFactoryBean schedulerFactoryBean = new</span><br><span class="line">SchedulerFactoryBean();schedulerFactoryBean.setQuartzProperties(quartzProperties());return</span><br><span class="line">schedulerFactoryBean;&#125;</span><br><span class="line"></span><br><span class="line">/\*\*\* 初始化监听器\*\* \@return</span><br><span class="line">QuartzInitializerListener\*/\@Beanpublic QuartzInitializerListener</span><br><span class="line">executorListener() &#123;return new QuartzInitializerListener();&#125;</span><br><span class="line"></span><br><span class="line">/\*\*\* 获得Scheduler对象\*\* \@return Scheduler\* \@throws IOException</span><br><span class="line">io\*/\@Beanpublic Scheduler scheduler() throws IOException &#123;return</span><br><span class="line">schedulerFactoryBean().getScheduler();&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>3.创建quartz.properties配置文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">\#</span><br><span class="line">实例化ThreadPool时，使用的线程类为SimpleThreadPoolorg.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool\#</span><br><span class="line">并发个数org.quartz.threadPool.threadCount=10\#</span><br><span class="line">优先级org.quartz.threadPool.threadPriority=3org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread=trueorg.quartz.jobStore.misfireThreshold=5000\#</span><br><span class="line">持久化使用的类org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX\#</span><br><span class="line">数据库中表的前缀org.quartz.jobStore.tablePrefix=QRTZ\_\#</span><br><span class="line">数据源命名org.quartz.jobStore.dataSource=qzDS\# qzDS</span><br><span class="line">数据源org.quartz.dataSource.qzDS.driver=com.mysql.jdbc.Driverorg.quartz.dataSource.qzDS.URL=jdbc:mysql://localhost:3306/mytest?useUnicode=true&amp;characterEncoding=UTF-8org.quartz.dataSource.qzDS.user=rootorg.quartz.dataSource.qzDS.password=rootorg.quartz.dataSource.qzDS.maxConnections=10</span><br><span class="line">``</span><br><span class="line">4.创建Quartz持久化数据的表</span><br><span class="line"></span><br><span class="line">数据表初始化sql放置在External</span><br><span class="line">Libraries的org/quartz/impl/jdbcjobstore中，直接用其初始化相关表即可。要注意的是，用来放置这些表的库要与quartz.properties的库一致。</span><br><span class="line"></span><br><span class="line">\#\# In your Quartz properties file, you\&#x27;ll need to set\#</span><br><span class="line">org.quartz.jobStore.driverDelegateClass =</span><br><span class="line">org.quartz.impl.jdbcjobstore.StdJDBCDelegate\#\#\# By: Ron Cordell -</span><br><span class="line">roncordell\# I didn\&#x27;t see this anywhere, so I thought I\&#x27;d post it</span><br><span class="line">here. This is the script from Quartz to create the tables in a MySQL</span><br><span class="line">database, modified to use INNODB instead of MYISAM.</span><br></pre></td></tr></table></figure>
+<p>DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;<br>DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;<br>DROP TABLE IF EXISTS QRTZ_LOCKS;<br>DROP TABLE IF EXISTS QRTZ_SIMPLE_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_SIMPROP_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_TRIGGERS;<br>DROP TABLE IF EXISTS QRTZ_JOB_DETAILS;<br>DROP TABLE IF EXISTS QRTZ_CALENDARS;</p>
+<p>CREATE TABLE QRTZ_JOB_DETAILS(SCHED_NAME VARCHAR(120) NOT<br>NULL,JOB_NAME VARCHAR(190) NOT NULL,JOB_GROUP VARCHAR(190) NOT<br>NULL,DESCRIPTION VARCHAR(250) NULL,JOB_CLASS_NAME VARCHAR(250) NOT<br>NULL,IS_DURABLE VARCHAR(1) NOT NULL,IS_NONCONCURRENT VARCHAR(1) NOT<br>NULL,IS_UPDATE_DATA VARCHAR(1) NOT NULL,REQUESTS_RECOVERY VARCHAR(1)<br>NOT NULL,JOB_DATA BLOB NULL,PRIMARY KEY<br>(SCHED_NAME,JOB_NAME,JOB_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_TRIGGERS (SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_NAME VARCHAR(190) NOT NULL,TRIGGER_GROUP VARCHAR(190) NOT<br>NULL,JOB_NAME VARCHAR(190) NOT NULL,JOB_GROUP VARCHAR(190) NOT<br>NULL,DESCRIPTION VARCHAR(250) NULL,NEXT_FIRE_TIME BIGINT(13)<br>NULL,PREV_FIRE_TIME BIGINT(13) NULL,PRIORITY INTEGER<br>NULL,TRIGGER_STATE VARCHAR(16) NOT NULL,TRIGGER_TYPE VARCHAR(8) NOT<br>NULL,START_TIME BIGINT(13) NOT NULL,END_TIME BIGINT(13)<br>NULL,CALENDAR_NAME VARCHAR(190) NULL,MISFIRE_INSTR SMALLINT(2)<br>NULL,JOB_DATA BLOB NULL,PRIMARY KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),FOREIGN KEY<br>(SCHED_NAME,JOB_NAME,JOB_GROUP)REFERENCES<br>QRTZ_JOB_DETAILS(SCHED_NAME,JOB_NAME,JOB_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_SIMPLE_TRIGGERS (SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_NAME VARCHAR(190) NOT NULL,TRIGGER_GROUP VARCHAR(190) NOT<br>NULL,REPEAT_COUNT BIGINT(7) NOT NULL,REPEAT_INTERVAL BIGINT(12) NOT<br>NULL,TIMES_TRIGGERED BIGINT(10) NOT NULL,PRIMARY KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),FOREIGN KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)REFERENCES<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_CRON_TRIGGERS (SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_NAME VARCHAR(190) NOT NULL,TRIGGER_GROUP VARCHAR(190) NOT<br>NULL,CRON_EXPRESSION VARCHAR(120) NOT NULL,TIME_ZONE_ID<br>VARCHAR(80),PRIMARY KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),FOREIGN KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)REFERENCES<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_SIMPROP_TRIGGERS(SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_NAME VARCHAR(190) NOT NULL,TRIGGER_GROUP VARCHAR(190) NOT<br>NULL,STR_PROP_1 VARCHAR(512) NULL,STR_PROP_2 VARCHAR(512)<br>NULL,STR_PROP_3 VARCHAR(512) NULL,INT_PROP_1 INT NULL,INT_PROP_2<br>INT NULL,LONG_PROP_1 BIGINT NULL,LONG_PROP_2 BIGINT<br>NULL,DEC_PROP_1 NUMERIC(13,4) NULL,DEC_PROP_2 NUMERIC(13,4)<br>NULL,BOOL_PROP_1 VARCHAR(1) NULL,BOOL_PROP_2 VARCHAR(1) NULL,PRIMARY<br>KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),FOREIGN KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)REFERENCES<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_BLOB_TRIGGERS (SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_NAME VARCHAR(190) NOT NULL,TRIGGER_GROUP VARCHAR(190) NOT<br>NULL,BLOB_DATA BLOB NULL,PRIMARY KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP),INDEX<br>(SCHED_NAME,TRIGGER_NAME, TRIGGER_GROUP),FOREIGN KEY<br>(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)REFERENCES<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_CALENDARS (SCHED_NAME VARCHAR(120) NOT<br>NULL,CALENDAR_NAME VARCHAR(190) NOT NULL,CALENDAR BLOB NOT NULL,PRIMARY<br>KEY (SCHED_NAME,CALENDAR_NAME))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS (SCHED_NAME VARCHAR(120) NOT<br>NULL,TRIGGER_GROUP VARCHAR(190) NOT NULL,PRIMARY KEY<br>(SCHED_NAME,TRIGGER_GROUP))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_FIRED_TRIGGERS (SCHED_NAME VARCHAR(120) NOT<br>NULL,ENTRY_ID VARCHAR(95) NOT NULL,TRIGGER_NAME VARCHAR(190) NOT<br>NULL,TRIGGER_GROUP VARCHAR(190) NOT NULL,INSTANCE_NAME VARCHAR(190)<br>NOT NULL,FIRED_TIME BIGINT(13) NOT NULL,SCHED_TIME BIGINT(13) NOT<br>NULL,PRIORITY INTEGER NOT NULL,STATE VARCHAR(16) NOT NULL,JOB_NAME<br>VARCHAR(190) NULL,JOB_GROUP VARCHAR(190) NULL,IS_NONCONCURRENT<br>VARCHAR(1) NULL,REQUESTS_RECOVERY VARCHAR(1) NULL,PRIMARY KEY<br>(SCHED_NAME,ENTRY_ID))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_SCHEDULER_STATE (SCHED_NAME VARCHAR(120) NOT<br>NULL,INSTANCE_NAME VARCHAR(190) NOT NULL,LAST_CHECKIN_TIME BIGINT(13)<br>NOT NULL,CHECKIN_INTERVAL BIGINT(13) NOT NULL,PRIMARY KEY<br>(SCHED_NAME,INSTANCE_NAME))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE TABLE QRTZ_LOCKS (SCHED_NAME VARCHAR(120) NOT NULL,LOCK_NAME<br>VARCHAR(40) NOT NULL,PRIMARY KEY (SCHED_NAME,LOCK_NAME))ENGINE&#x3D;InnoDB;</p>
+<p>CREATE INDEX IDX_QRTZ_J_REQ_RECOVERY ON<br>QRTZ_JOB_DETAILS(SCHED_NAME,REQUESTS_RECOVERY);CREATE INDEX<br>IDX_QRTZ_J_GRP ON QRTZ_JOB_DETAILS(SCHED_NAME,JOB_GROUP);</p>
+<p>CREATE INDEX IDX_QRTZ_T_J ON<br>QRTZ_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROUP);CREATE INDEX<br>IDX_QRTZ_T_JG ON QRTZ_TRIGGERS(SCHED_NAME,JOB_GROUP);CREATE INDEX<br>IDX_QRTZ_T_C ON QRTZ_TRIGGERS(SCHED_NAME,CALENDAR_NAME);CREATE<br>INDEX IDX_QRTZ_T_G ON<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);CREATE INDEX<br>IDX_QRTZ_T_STATE ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_STATE);CREATE<br>INDEX IDX_QRTZ_T_N_STATE ON<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,TRIGGER_STATE);CREATE<br>INDEX IDX_QRTZ_T_N_G_STATE ON<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_GROUP,TRIGGER_STATE);CREATE INDEX<br>IDX_QRTZ_T_NEXT_FIRE_TIME ON<br>QRTZ_TRIGGERS(SCHED_NAME,NEXT_FIRE_TIME);CREATE INDEX<br>IDX_QRTZ_T_NFT_ST ON<br>QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_STATE,NEXT_FIRE_TIME);CREATE INDEX<br>IDX_QRTZ_T_NFT_MISFIRE ON<br>QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME);CREATE INDEX<br>IDX_QRTZ_T_NFT_ST_MISFIRE ON<br>QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE);CREATE<br>INDEX IDX_QRTZ_T_NFT_ST_MISFIRE_GRP ON<br>QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE);</p>
+<p>CREATE INDEX IDX_QRTZ_FT_TRIG_INST_NAME ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,INSTANCE_NAME);CREATE INDEX<br>IDX_QRTZ_FT_INST_JOB_REQ_RCVRY ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,INSTANCE_NAME,REQUESTS_RECOVERY);CREATE<br>INDEX IDX_QRTZ_FT_J_G ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROUP);CREATE INDEX<br>IDX_QRTZ_FT_JG ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_GROUP);CREATE INDEX<br>IDX_QRTZ_FT_T_G ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);CREATE<br>INDEX IDX_QRTZ_FT_TG ON<br>QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);</p>
+<p>commit;</p>
+<pre><code>
+以上是Quartz的全部内容，喜欢的朋友请顺手点个赞！
+
+**福利**
+
+**免责声明：**
+
+本公众号部分分享的资料来自网络收集和整理，所有文字和图片版权归属于原作者所有，且仅代表作者个人观点，与**本公众号**无关，文章仅供读者学习交流使用，并请自行核实相关内容，如文章内容涉及侵权，请联系后台管理员删除。
+</code></pre>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://start-spt.github.io">Peter</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://start-spt.github.io/2022/09/14/quartz20220914/">https://start-spt.github.io/2022/09/14/quartz20220914/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://start-spt.github.io" target="_blank">Utopia</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/quartz/">quartz</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/09/14/economy20220814/"><img class="next-cover" src="https://s2.loli.net/2022/09/14/uvbPZ6ALVGgX5wo.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">经济发展之内循环、外循环</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://butterfly.js.org/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Peter</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/xxxxx" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:xxxxxx@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/09/14/quartz20220914/" title="深入Quartz，更优雅地管理你的定时任务"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深入Quartz，更优雅地管理你的定时任务"/></a><div class="content"><a class="title" href="/2022/09/14/quartz20220914/" title="深入Quartz，更优雅地管理你的定时任务">深入Quartz，更优雅地管理你的定时任务</a><time datetime="2022-09-14T07:44:04.000Z" title="发表于 2022-09-14 15:44:04">2022-09-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/14/economy20220814/" title="经济发展之内循环、外循环"><img src="https://s2.loli.net/2022/09/14/uvbPZ6ALVGgX5wo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="经济发展之内循环、外循环"/></a><div class="content"><a class="title" href="/2022/09/14/economy20220814/" title="经济发展之内循环、外循环">经济发展之内循环、外循环</a><time datetime="2022-09-14T06:29:19.000Z" title="发表于 2022-09-14 14:29:19">2022-09-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/02/ebooks/" title="ebooks"><img src="https://fastly.jsdelivr.net/gh/jerryc127/CDN@latest/Photo/friends.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ebooks"/></a><div class="content"><a class="title" href="/2022/08/02/ebooks/" title="ebooks">ebooks</a><time datetime="2022-08-02T01:38:38.000Z" title="发表于 2022-08-02 09:38:38">2022-08-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/06/18/rabbitMQ/" title="使用rabbitMQ实现聊天消息的转发"><img src="https://s2.loli.net/2022/06/29/Bta5HYLQzPxb4Uo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用rabbitMQ实现聊天消息的转发"/></a><div class="content"><a class="title" href="/2022/06/18/rabbitMQ/" title="使用rabbitMQ实现聊天消息的转发">使用rabbitMQ实现聊天消息的转发</a><time datetime="2022-06-18T06:15:01.000Z" title="发表于 2022-06-18 14:15:01">2022-06-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/06/14/goods/" title="我的一些货物清单"><img src="https://tse1-mm.cn.bing.net/th/id/R-C.d42c888a14bef85311a5742cc9d25625?rik=316lPQjuCJjtKQ&amp;pid=ImgRaw&amp;r=0" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="我的一些货物清单"/></a><div class="content"><a class="title" href="/2022/06/14/goods/" title="我的一些货物清单">我的一些货物清单</a><time datetime="2022-06-14T02:20:21.000Z" title="发表于 2022-06-14 10:20:21">2022-06-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Peter</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat_btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'seFmW26VCVGSQoyYaCbgduoL-gzGzoHsz',
+      appKey: 'iVpvi3bHwKyDSlGj8QvQrGA9',
+      avatar: 'wavatar',
+      serverURLs: 'https://sefmw26v.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="//code.tidio.co/2intacnjctb5x4tysl4llqjnwn7dzbig.js" async="async"></script><script>function onTidioChatApiReady() {
+  window.tidioChatApi.hide();
+  window.tidioChatApi.on("close", function() {
+    window.tidioChatApi.hide();
+  });
+}
+if (window.tidioChatApi) {
+  window.tidioChatApi.on("ready", onTidioChatApiReady);
+} else {
+  document.addEventListener("tidioChat-ready", onTidioChatApiReady);
+}
+
+var chatBtnFn = () => {
+  document.getElementById("chat_btn").addEventListener("click", function(){
+    window.tidioChatApi.show();
+    window.tidioChatApi.open();
+  });
+}
+chatBtnFn()
+</script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/meting@1.2/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
