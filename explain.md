@@ -1,5 +1,12 @@
 ## hexo构建
- 参考:.https://blog.csdn.net/sinat_37781304/article/details/82729029
+ 参考:
+ - https://blog.csdn.net/sinat_37781304/article/details/82729029
+ - https://www.cnblogs.com/yyyzyyyz/p/15542401.html
+
+
+ ## 在自己的服务器上搭建 Hexo 博客
+ 参考:
+ - https://gukaifeng.cn/posts/zai-zi-ji-de-fu-wu-qi-shang-da-jian-hexo-bo-ke/#3-3-%E9%85%8D%E7%BD%AE-Git-Hook
 
 ## Aplayer & Dplayer 嵌入音频和视频:
 
