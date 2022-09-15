@@ -176,45 +176,41 @@ BIO的问题其实不用多说了，因为在使用BIO时，主线程会进入�
 
 当执行到`byteBuffer.put(bytes)`，当`put()`进入多少数据，position就会增加多少，参数就会发生变化：
 
-![](media/rId51.png){width="3.5972222222222223in"
-height="1.7916666666666667in"}
+![640(4)](./netty-nio-001/640(4))
 
-![](media/rId52.png){width="5.833333333333333in"
-height="1.959876421697288in"}
+![640(5)](./netty-nio-001/640(5))
 
 接下来关键一步`byteBuffer.flip()`，会发生如下变化：
 
-![](media/rId53.png){width="5.833333333333333in"
-height="2.3581550743657043in"}
+![640(6)](./netty-nio-001/640(6))
 
-![](media/rId54.png){width="5.833333333333333in"
-height="1.809268372703412in"}
+![640(7)](./netty-nio-001/640(7))
 
 `flip()`方法的源码如下：
-
+```java
         public final Buffer flip() {
             limit = position;
             position = 0;
             mark = -1;
             return this;
         }
+```
 
 为什么要这样赋值呢？因为下面有一句循环条件判断：
-
+```java
     byteBuffer.hasRemaining();
     public final boolean hasRemaining() {
         //判断position的索引是否小于limit。
         //所以可以看出limit的作用就是记录写入数据的位置，那么当读取数据时，就知道读到哪个位置
         return position < limit;
     }
+```
 
 接下来就是在`while`循环中`get()`读取数据，读取完之后。
 
-![](media/rId55.png){width="4.097222222222222in"
-height="1.4861111111111112in"}
+![640(8)](./netty-nio-001/640(8))
 
-![](media/rId56.png){width="5.833333333333333in"
-height="1.9939676290463693in"}
+![640(9)](./netty-nio-001/640(9))
 
 最后当`position`等于`limit`时，循环判断条件不成立，就跳出循环，读取完毕。
 
@@ -224,14 +220,13 @@ height="1.9939676290463693in"}
 
 首先我们看一下Channel有哪些子类：
 
-![](media/rId58.png){width="5.833333333333333in"
-height="1.3098797025371829in"}
+![640(10)](./netty-nio-001/640(10))
 
 常用的Channel有这四种：
 
-> FileChannel，读写文件中的数据。\
-> SocketChannel，通过TCP读写网络中的数据。\
-> ServerSockectChannel，监听新进来的TCP连接，像Web服务器那样。对每一个新进来的连接都会创建一个SocketChannel。\
+> FileChannel，读写文件中的数据。
+> SocketChannel，通过TCP读写网络中的数据。
+> ServerSockectChannel，监听新进来的TCP连接，像Web服务器那样。对每一个新进来的连接都会创建一个SocketChannel。
 > DatagramChannel，通过UDP读写网络中的数据。
 
 **Channel本身并不存储数据，只是负责数据的运输**。必须要和`Buffer`一起使用。
@@ -240,10 +235,10 @@ height="1.3098797025371829in"}
 
 FileChannel的获取方式，下面举个文件复制拷贝的例子进行说明：
 
-![](media/rId60.png){width="4.277777777777778in"
-height="3.5555555555555554in"}
+![640(11)](./netty-nio-001/640(11))
 
 首先准备一个\"1.txt\"放在项目的根目录下，然后编写一个main方法：
+```java
 
         public static void main(String[] args) throws Exception {
             //获取文件输入流
@@ -269,22 +264,22 @@ height="3.5555555555555554in"}
             outputStreamChannel.close();
             inputStreamChannel.close();
         }
+```
 
 执行后，我们就获得一个\"2.txt\"。执行成功。
 
-![](media/rId61.png){width="4.041666666666667in"
-height="3.8472222222222223in"}
+![640(12)](./netty-nio-001/640(12))
 
 以上的例子，可以用一张示意图表示，是这样的：
 
-![](media/rId62.png){width="5.833333333333333in"
-height="2.342400481189851in"}
+![640(13)](./netty-nio-001/640(13))
 
 ### 2.2.1.2 SocketChannel 
 
 接下来我们学习获取`SocketChannel`的方式。
 
 还是一样，我们通过一个例子来快速上手：
+```java
 
         public static void main(String[] args) throws Exception {
             //获取ServerSocketChannel
@@ -305,11 +300,11 @@ height="2.342400481189851in"}
                 }
             }
         }
+```
 
 然后运行main()方法，我们可以通过`telnet`命令进行连接测试：
 
-![](media/rId64.png){width="5.833333333333333in"
-height="2.9706780402449695in"}
+![640(14)](./netty-nio-001/640(14))
 
 通过上面的例子可以知道，通过`ServerSocketChannel.open()`方法可以获取服务器的通道，然后绑定一个地址端口号，接着`accept()`方法可获得一个`SocketChannel`通道，也就是客户端的连接通道。
 
@@ -325,15 +320,16 @@ height="2.9706780402449695in"}
 
 选择器可以说是NIO的核心组件，它可以监听通道的状态，来实现异步非阻塞的IO。换句话说，也就是事件驱动。以此实现**单线程管理多个Channel**的目的。
 
-![](media/rId66.png){width="4.25in" height="3.3645833333333335in"}
+![640(15)](./netty-nio-001/640(15))
+
 
 ### 2.3.1 核心API 
 
-  API方法名         作用
-  ----------------- -------------------------------------------------
-  Selector.open()   打开一个选择器。
-  select()          选择一组键，其相应的通道已为 I/O 操作准备就绪。
-  selectedKeys()    返回此选择器的已选择键集。
+  API方法名   |      作用
+  ----------------- |-------------------------------------------------
+  Selector.open()  | 打开一个选择器。
+  select()         | 选择一组键，其相应的通道已为 I/O 操作准备就绪。
+  selectedKeys()   | 返回此选择器的已选择键集。
 
 以上的API会在后面的例子用到，先有个印象。
 
@@ -345,6 +341,7 @@ NIO快速入门
 这里主要介绍两个通道与通道之间数据传输的方式：
 
 `transferTo()`：把源通道的数据传输到目的通道中。
+```java
 
         public static void main(String[] args) throws Exception {
             //获取文件输入流
@@ -366,8 +363,10 @@ NIO快速入门
             outputStreamChannel.close();
             inputStreamChannel.close();
         }    
+```
 
 `transferFrom()`：把来自源通道的数据传输到目的通道。
+```java
 
         public static void main(String[] args) throws Exception {
             //获取文件输入流
@@ -389,24 +388,27 @@ NIO快速入门
             outputStreamChannel.close();
             inputStreamChannel.close();
         }
+```
 
 ### 3.1.2 分散读取和聚合写入 
 
 我们先看一下FileChannel的源码：
-
+```java
     public abstract class FileChannel extends AbstractInterruptibleChannel
         implements SeekableByteChannel, GatheringByteChannel, ScatteringByteChannel {   
     }
+```
 
 从源码中可以看出实现了GatheringByteChannel,
 ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操作。怎么使用呢，请看以下例子：
 
 我们写一个main方法来实现复制1.txt文件，文件内容是：
-
+```
     abcdefghijklmnopqrstuvwxyz//26个字母
+```
 
 代码如下：
-
+```java
         public static void main(String[] args) throws Exception {
             //获取文件输入流
             File file = new File("1.txt");
@@ -445,9 +447,10 @@ ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操�
             outputStreamChannel.close();
             inputStreamChannel.close();
         }
+```
 
 打印结果：
-
+```
     posstion=5,limit=5
     posstion=5,limit=5
     posstion=5,limit=5
@@ -457,6 +460,7 @@ ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操�
     posstion=1,limit=5
 
     总长度:26
+```
 
 可以看到循环了两次。第一次循环时，三个缓冲区都读取了5个字节，总共读取了15，也就是读满了。还剩下11个字节，于是第二次循环时，前两个缓冲区分配了5个字节，最后一个缓冲区给他分配了1个字节，刚好读完。总共就是26个字节。
 
@@ -467,25 +471,25 @@ ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操�
 ### 3.1.3 非直接/直接缓冲区 
 
 非直接缓冲区的创建方式：
-
+```
     static ByteBuffer allocate(int capacity)
+```
 
 直接缓冲区的创建方式：
-
+```
     static ByteBuffer allocateDirect(int capacity)
+```
 
 非直接/直接缓冲区的区别示意图：
 
-![](media/rId72.png){width="5.833333333333333in"
-height="2.8680555555555554in"}
+![640(16)](./netty-nio-001/640(16))
 
-![](media/rId73.png){width="5.833333333333333in"
-height="3.3541666666666665in"}
+![640(17)](./netty-nio-001/640(17))
 
 从示意图中我们可以发现，最大的不同在于直接缓冲区不需要再把文件内容copy到物理内存中。这就大大地提高了性能。其实在介绍Buffer时，我们就有接触到这个概念。直接缓冲区是堆外内存，在本地文件IO效率会更高一点。
 
 接下来我们来对比一下效率，以一个136 MB的视频文件为例：
-
+```java
     public static void main(String[] args) throws Exception {
         long starTime = System.currentTimeMillis();
         //获取文件输入流
@@ -516,6 +520,7 @@ height="3.3541666666666665in"}
         long endTime = System.currentTimeMillis();
         System.out.println("消耗时间：" + (endTime - starTime) + "毫秒");
     }
+```
 
 结果：
 
@@ -534,7 +539,7 @@ height="3.3541666666666665in"}
 接下来趁热打铁，我们来做一个服务器接受客户端消息的例子：
 
 首先服务端代码：
-
+```java
     public class NIOServer {
         public static void main(String[] args) throws Exception {
             //打开一个ServerSocketChannel
@@ -587,9 +592,10 @@ height="3.3541666666666665in"}
             }
         }
     }
+```
 
 客户端代码：
-
+```java
     public class NIOClient {
         public static void main(String[] args) throws Exception {
             SocketChannel socketChannel = SocketChannel.open();
@@ -612,21 +618,21 @@ height="3.3541666666666665in"}
             System.in.read();
         }
     }
-
+```
 接下来启动服务端，然后再启动客户端，我们可以看到控制台打印以下信息：
-
+```
     服务器等待3秒，没有连接
     服务器等待3秒，没有连接
     from 客户端：hello java技术爱好者！                       
     服务器等待3秒，没有连接
     服务器等待3秒，没有连接
-
+```
 通过这个例子我们引出以下知识点。
 
 ### 3.2.2 SelectionKey 
 
 在`SelectionKey`类中有四个常量表示四种事件，来看源码：
-
+```java
     public abstract class SelectionKey {
         //读事件
         public static final int OP_READ = 1 << 0; //2^0=1
@@ -637,23 +643,23 @@ height="3.3541666666666665in"}
         //连接可接受操作,仅ServerSocketChannel支持
         public static final int OP_ACCEPT = 1 << 4; // 2^4=16
     }
-
+```
 附加的对象(可选)，把通道注册到选择器中时可以附加一个对象。
-
+```java
     public final SelectionKey register(Selector sel, int ops, Object att)
-
+```
 从`selectionKey`中获取附件对象可以使用`attachment()`方法
-
+```java
     public final Object attachment() {
         return attachment;
     }
-
+```
 ### 4 使用NIO实现多人聊天室 
 
 接下来进行一个实战例子，用NIO实现一个多人运动版本的聊天室。
 
 服务端代码：
-
+```java
     public class GroupChatServer {
 
         private Selector selector;
@@ -778,9 +784,9 @@ height="3.3541666666666665in"}
             chatServer.listen();
         }
     }
-
+```
 客户端代码：
-
+```java
     public class GroupChatClinet {
 
         private Selector selector;
@@ -864,130 +870,20 @@ height="3.3541666666666665in"}
             }
         }
     }
-
+```
 先启动服务端的main方法，再启动两个客户端的main方法：
 
-![](media/rId78.png){width="5.833333333333333in"
-height="3.279220253718285in"}
+![640(18)](./netty-nio-001/640(18))
 
 然后使用两个客户端开始聊天了\~
 
-![](media/rId79.png){width="5.833333333333333in"
-height="2.7131780402449692in"}
+![640(19)](./netty-nio-001/640(19))
 
-![](media/rId80.png){width="5.833333333333333in"
-height="2.9809612860892387in"}
+![640(20)](./netty-nio-001/640(20))
 
 以上就是使用NIO**实现多人聊天室**的例子，同学们可以看着我这个例子自己完成一下。要多写代码才好理解这些概念。
 
-写在最后
-========
+---
+**免责声明：**
 
-**创作不易**，觉得有用就**点个关注**吧。
-
-想第一时间看到我更新的文章，可以微信搜索公众号「`java技术爱好者`」，**拒绝做一条咸鱼，我是一个努力让大家记住的程序员。我们下期再见！！！**
-
-> 能力有限，如果有什么错误或者不当之处，请大家批评指正，一起学习交流！
-
-[【加入技术交流群】](http://mp.weixin.qq.com/s?__biz=MzU1OTgzNTAzNQ==&mid=2247483709&idx=1&sn=5e7bef374da7022af497e969e557ccab&chksm=fc1073c9cb67fadfef5e494cd63711b3cc338d4b3c44716b79aa8cc3ff44cf0b68a19c4532bc&scene=21#wechat_redirect)
-
-![图片](media/rId83.png){width="5.833333333333333in"
-height="2.60879593175853in"}
-
-![图片](media/rId84.png){width="0.6527777777777778in"
-height="0.5833333333333334in"}
-
-给个**\[在看\]**，是对作者最大的支持哦
-
-预览时标签不可点
-
-收录于合集 \#网络编程
-
- 4个
-
-下一篇进击的NIO！Reactor模式！
-
-喜欢此内容的人还喜欢
-
-上海部分区调整明天上课时间！奉贤区：明天上午停课，松江区：推迟2小时到校
-
-上海部分区调整明天上课时间！奉贤区：明天上午停课，松江区：推迟2小时到校
-
- 
-
-上观新闻
-
-赞 70
-
-不喜欢
-
-不看的原因
-
-确定
-
--   内容质量低
-
--   不看此公众号
-
-![](media/rId97.jpeg){width="5.833333333333333in"
-height="5.833333333333333in"}
-
-俄罗斯为啥那么提防中国人去西伯利亚
-
-俄罗斯为啥那么提防中国人去西伯利亚
-
- 
-
-九边
-
-赞 1.6万
-
-不喜欢
-
-不看的原因
-
-确定
-
--   内容质量低
-
--   不看此公众号
-
-![](media/rId101.jpeg){width="5.833333333333333in"
-height="5.838883420822397in"}
-
-警惕！国内该地已现首例输入性猴痘！
-
-警惕！国内该地已现首例输入性猴痘！
-
- 
-
-新闻坊
-
-赞 33
-
-不喜欢
-
-不看的原因
-
-确定
-
--   内容质量低
-
--   不看此公众号
-
-![](media/rId105.jpeg){width="4.777777777777778in"
-height="4.763888888888889in"}
-
-微信扫一扫\
-关注该公众号
-
-[知道了](javascript:;)
-
-微信扫一扫\
-使用小程序
-
-[取消](javascript:void(0);) [允许](javascript:void(0);)
-
-[取消](javascript:void(0);) [允许](javascript:void(0);)
-
-： ， 。   视频 小程序 赞 ，轻点两下取消赞 在看 ，轻点两下取消在看
+本公博客部分分享的资料来自网络收集和整理，所有文字和图片版权归属于原作者所有，且仅代表作者个人观点，与**本博客**无关，文章仅供读者学习交流使用，并请自行核实相关内容，如文章内容涉及侵权，请联系后台管理员删除。
