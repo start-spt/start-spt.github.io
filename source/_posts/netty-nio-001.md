@@ -392,8 +392,7 @@ NIO快速入门
     }
 ```
 
-从源码中可以看出实现了GatheringByteChannel,
-ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操作。怎么使用呢，请看以下例子：
+从源码中可以看出实现了GatheringByteChannel,ScatteringByteChannel接口。也就是支持分散读取和聚合写入的操作。怎么使用呢，请看以下例子：
 
 我们写一个main方法来实现复制1.txt文件，文件内容是：
 ```
