@@ -62,7 +62,7 @@ spring-boot-autoconfigure-x.x.x.x.jar里就有一个这样的spring.factories文
 
 ![图片](./springboot-start-20220922/640(6).png)
 
-这个@EnableAutoConfiguration注解通过@SpringBootApplication被间接的标记在了SpringBoot的启动类上.在`SpringApplication.run(\...)`的内部就会执行selectImports()方法，找到所有JavaConfig自动配置类的全限定名对应的class，然后将所有自动配置类加载到Spring容器中。
+这个@EnableAutoConfiguration注解通过@SpringBootApplication被间接的标记在了SpringBoot的启动类上.在`"SpringApplication.run(\...)"`的内部就会执行selectImports()方法，找到所有JavaConfig自动配置类的全限定名对应的class，然后将所有自动配置类加载到Spring容器中。
 
 
 自动配置生效
